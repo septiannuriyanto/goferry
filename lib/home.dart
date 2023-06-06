@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:goferry/data.dart';
+import 'package:goferry/dialog.dart';
 import 'package:goferry/setup.dart';
 import 'package:goferry/custom_button.dart';
 import 'package:goferry/custom_loading.dart';
@@ -18,10 +19,12 @@ class Home extends GetResponsiveView {
   final tanggal_c = TextEditingController();
   final namaekspedisi_c = TextEditingController();
   final jenisekspedisi_c = TextEditingController();
+  final muatan_c = TextEditingController();
   final manifest_c = TextEditingController();
   final driver_c = TextEditingController();
   final origin_c = TextEditingController();
   final inputter_c = TextEditingController();
+  final remark_c = TextEditingController();
   DateTime? dt;
 
   @override
@@ -84,28 +87,32 @@ class Home extends GetResponsiveView {
                   ),
                   child: Form(
                       child: Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: CustomTextField(
+                            autoFocus: true,
                             textEditingController: tanggal_c,
                             hintText: "Tanggal Pengangkutan",
-                            onTap: () async {
-                              dt = await showDatePicker(
-                                context: screen.context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.now()
-                                    .subtract(const Duration(days: 30)),
-                                lastDate: DateTime.now()
-                                    .add(const Duration(days: 30)),
-                              );
-                              if (dt != null) {
-                                tanggal_c.text =
-                                    DateFormat('dd/MMM/yyyy').format(dt!);
-                              }
-                            },
+                            prefixIcon: IconButton(
+                              icon: const Icon(Icons.search),
+                              onPressed: () async {
+                                dt = await showDatePicker(
+                                  context: screen.context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime.now()
+                                      .subtract(const Duration(days: 30)),
+                                  lastDate: DateTime.now()
+                                      .add(const Duration(days: 30)),
+                                );
+                                if (dt != null) {
+                                  tanggal_c.text =
+                                      DateFormat('dd/MMM/yyyy').format(dt!);
+                                }
+                              },
+                            ),
                           ),
                         ),
                         Padding(
@@ -118,8 +125,42 @@ class Home extends GetResponsiveView {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: CustomTextField(
+                            prefixIcon: IconButton(
+                                icon: Icon(
+                                  Icons.search,
+                                  color: ThemeColor.mainColor,
+                                ),
+                                onPressed: () async {
+                                  final data = await Get.dialog(FreightDialog(
+                                    dataGroup: freight,
+                                  ));
+                                  if (data != null) {
+                                    jenisekspedisi_c.text = data;
+                                  }
+                                }),
                             textEditingController: jenisekspedisi_c,
                             hintText: "Jenis Ekspedisi",
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CustomTextField(
+                            textEditingController: muatan_c,
+                            hintText: "Muatan",
+                            prefixIcon: IconButton(
+                              icon: Icon(
+                                Icons.search,
+                                color: ThemeColor.mainColor,
+                              ),
+                              onPressed: () async {
+                                final data = await Get.dialog(FreightDialog(
+                                  dataGroup: muatan,
+                                ));
+                                if (data != null) {
+                                  muatan_c.text = data;
+                                }
+                              },
+                            ),
                           ),
                         ),
                         Padding(
@@ -141,6 +182,20 @@ class Home extends GetResponsiveView {
                           child: CustomTextField(
                             textEditingController: origin_c,
                             hintText: "Berangkat Dari",
+                            prefixIcon: IconButton(
+                              icon: Icon(
+                                Icons.search,
+                                color: ThemeColor.mainColor,
+                              ),
+                              onPressed: () async {
+                                final data = await Get.dialog(FreightDialog(
+                                  dataGroup: origin,
+                                ));
+                                if (data != null) {
+                                  origin_c.text = data;
+                                }
+                              },
+                            ),
                           ),
                         ),
                         Padding(
@@ -148,6 +203,13 @@ class Home extends GetResponsiveView {
                           child: CustomTextField(
                             textEditingController: inputter_c,
                             hintText: "Diinput Oleh",
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CustomTextField(
+                            textEditingController: remark_c,
+                            hintText: "Remark (Opsional)",
                           ),
                         ),
                         const SizedBox(
@@ -175,6 +237,11 @@ class Home extends GetResponsiveView {
                                     "Error", "Jenis Ekspedisi Harus diisi !");
                                 return;
                               }
+                              if (muatan_c.text.isEmpty) {
+                                customErrorMessage(
+                                    "Error", "Jenis Muatan Harus diisi !");
+                                return;
+                              }
                               if (manifest_c.text.isEmpty) {
                                 customErrorMessage(
                                     "Error", "Nomor Manifest Harus diisi !");
@@ -200,10 +267,12 @@ class Home extends GetResponsiveView {
                                 tanggal_c.text,
                                 namaekspedisi_c.text,
                                 jenisekspedisi_c.text,
+                                muatan_c.text,
                                 manifest_c.text,
                                 driver_c.text,
                                 origin_c.text,
                                 inputter_c.text,
+                                remark_c.text,
                               );
                             })
                       ],
@@ -223,10 +292,12 @@ class Home extends GetResponsiveView {
     String tanggal,
     String namaEkspedisi,
     String jenisEkspedisi,
+    String muatan,
     String manifest,
     String driverName,
     String asal,
     String inputter,
+    String remark,
   ) async {
     String periode = DateFormat('yyyyMMdd').format(tgl);
 
@@ -243,21 +314,34 @@ class Home extends GetResponsiveView {
         tanggal,
         namaEkspedisi,
         jenisEkspedisi,
-        manifest,
+        muatan,
+        manifest.toUpperCase(),
         driverName,
         asal,
-        inputter
+        inputter,
+        remark
       ];
 
       await sheet.values.insertRow(lastRow + 1, newData);
     } catch (e) {
       Get.back();
-      customErrorMessage("Erro submitting data", e.toString());
+      customErrorMessage("Error submitting data", e.toString());
       print(e);
       return;
     }
 
     Get.back();
+
+    dt = null;
+    tanggal_c.clear();
+    namaekspedisi_c.clear();
+    jenisekspedisi_c.clear();
+    muatan_c.clear();
+    manifest_c.clear();
+    driver_c.clear();
+    origin_c.clear();
+    inputter_c.clear();
+
     customSuccessMessage("Success", "Sukses Mengirim Data !");
   }
 }

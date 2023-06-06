@@ -23,6 +23,7 @@ InputDecoration kTextFieldDecoration = InputDecoration(
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
     Key? key,
+    this.autoFocus,
     this.prefix,
     this.enabled,
     this.prefixIcon,
@@ -37,12 +38,13 @@ class CustomTextField extends StatelessWidget {
     this.onSaved,
     this.textInputFormatter,
   }) : super(key: key);
+  final bool? autoFocus;
   final bool? enabled;
   final bool? isPassword;
   final TextEditingController? textEditingController;
   final List<TextInputFormatter>? textInputFormatter;
   final String? hintText, labelText;
-  final Icon? prefixIcon;
+  final Widget? prefixIcon;
   final Widget? prefix;
   final String? Function(String?)? validator;
   final AutovalidateMode? autovalidateMode;
@@ -53,6 +55,9 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textAlignVertical: TextAlignVertical.center,
+      autofocus: autoFocus ?? false,
+      textCapitalization: TextCapitalization.words,
       enabled: enabled,
       autovalidateMode: autovalidateMode,
       keyboardType: keyboardType,
@@ -61,12 +66,14 @@ class CustomTextField extends StatelessWidget {
       controller: textEditingController,
       inputFormatters: textInputFormatter,
       decoration: kTextFieldDecoration.copyWith(
-          //contentPadding: EdgeInsets.all(0),
-          prefix: prefix,
-          prefixIcon: prefixIcon,
-          hintText: hintText,
-          labelText: labelText,
-          suffixIcon: const SizedBox(height: 0)),
+        isCollapsed: true,
+        prefix: prefix,
+        prefixIconColor: ThemeColor.mainColor,
+        prefixIcon: prefixIcon,
+        hintText: hintText,
+        labelText: labelText,
+        suffixIcon: const SizedBox(height: 0),
+      ),
       onSaved: onSaved,
       onTap: onTap,
     );
