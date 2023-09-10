@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-final defaultFont = GoogleFonts.poppins();
+const defaultFont = TextStyle(fontFamily: "Roboto");
 
 final textTheme = TextTheme(
   displayLarge: defaultFont.copyWith(

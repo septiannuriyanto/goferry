@@ -1,4 +1,4 @@
-package com.example.goferry
+package com.scalar.goferry
 
 import io.flutter.embedding.android.FlutterActivity
 

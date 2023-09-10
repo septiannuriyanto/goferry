@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:goferry/text_theme.dart';
 import 'package:goferry/theme.dart';
@@ -6,11 +7,13 @@ import 'package:goferry/theme.dart';
 import 'home.dart';
 
 void main() {
-  runApp(const MyApp());
+  SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(statusBarColor: ThemeColor.mainColor));
+  runApp(const GoFerry());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class GoFerry extends StatelessWidget {
+  const GoFerry({super.key});
 
   // This widget is the root of your application.
   @override
