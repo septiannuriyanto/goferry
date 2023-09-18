@@ -26,5 +26,7 @@ This app is produced with the flutter framework, with some functionality planned
 
 ## Changelog
 
+<li> 18 September 2023, <i> Added sort functionality </i>
+<li> 17 September 2023, <i> Fixed bug text input doesn't update after receiving value from choice dialog </i>
 <li> 10 September 2023, <i> Completed History Tab</i>
 <li> 14 July 2023, <i> Minimum Viable Product</i>

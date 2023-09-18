@@ -13,19 +13,13 @@ import 'package:gsheets/gsheets.dart';
 import 'package:intl/intl.dart';
 
 import '../setup.dart';
+import 'input_delivery_controller.dart';
 
 class InputDelivery extends GetResponsiveView {
   InputDelivery({super.key});
-  final tanggal_c = TextEditingController();
-  final namaekspedisi_c = TextEditingController();
-  final nopol_c = TextEditingController();
-  final jenisekspedisi_c = TextEditingController();
-  final muatan_c = TextEditingController();
-  final manifest_c = TextEditingController();
-  final driver_c = TextEditingController();
-  final origin_c = TextEditingController();
-  final inputter_c = TextEditingController();
-  final remark_c = TextEditingController();
+
+  final cont = Get.put(InputDeliveryController());
+
   DateTime? dt;
 
   @override
@@ -45,7 +39,7 @@ class InputDelivery extends GetResponsiveView {
             ),
           ),
           Container(
-            width: screen.isDesktop ? Get.width * 0.5 : Get.width * 0.9,
+            width: screen.isDesktop ? Get.width * 0.3 : Get.width * 0.9,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(12)),
               color: Colors.white,
@@ -58,130 +52,138 @@ class InputDelivery extends GetResponsiveView {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: CustomTextField(
-                      autoFocus: true,
-                      textEditingController: tanggal_c,
-                      hintText: "Tanggal Pengangkutan",
-                      prefixIcon: IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () async {
-                          dt = await showDatePicker(
-                            context: screen.context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime.now()
-                                .subtract(const Duration(days: 30)),
-                            lastDate:
-                                DateTime.now().add(const Duration(days: 30)),
-                          );
-                          if (dt != null) {
-                            tanggal_c.text =
-                                DateFormat('dd/MMM/yyyy').format(dt!);
-                          }
-                        },
+                    child: Obx(
+                      () => CustomTextField(
+                        autoFocus: true,
+                        textEditingController: cont.tanggal_c.value,
+                        hintText: "Tanggal Pengangkutan",
+                        prefixIcon: IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () async {
+                            dt = await showDatePicker(
+                              context: screen.context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime.now()
+                                  .subtract(const Duration(days: 30)),
+                              lastDate:
+                                  DateTime.now().add(const Duration(days: 30)),
+                            );
+                            if (dt != null) {
+                              cont.tanggal_c.value.text =
+                                  DateFormat('dd/MMM/yyyy').format(dt!);
+                            }
+                          },
+                        ),
                       ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CustomTextField(
-                      textEditingController: namaekspedisi_c,
+                      textEditingController: cont.namaekspedisi_c.value,
                       hintText: "Vendor Ekspedisi",
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CustomTextField(
-                      textEditingController: nopol_c,
+                      textEditingController: cont.nopol_c.value,
                       hintText: "Nomor Polisi",
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: CustomTextField(
-                      prefixIcon: IconButton(
+                    child: Obx(
+                      () => CustomTextField(
+                        prefixIcon: IconButton(
+                            icon: Icon(
+                              Icons.search,
+                              color: ThemeColor.mainColor,
+                            ),
+                            onPressed: () async {
+                              final data = await Get.dialog(FreightDialog(
+                                dataGroup: freight,
+                              ));
+                              if (data != null) {
+                                cont.jenisekspedisi_c.value.text = data;
+                              }
+                            }),
+                        textEditingController: cont.jenisekspedisi_c.value,
+                        hintText: "Jenis Ekspedisi",
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Obx(
+                      () => CustomTextField(
+                        textEditingController: cont.muatan_c.value,
+                        hintText: "Muatan",
+                        prefixIcon: IconButton(
                           icon: Icon(
                             Icons.search,
                             color: ThemeColor.mainColor,
                           ),
                           onPressed: () async {
                             final data = await Get.dialog(FreightDialog(
-                              dataGroup: freight,
+                              dataGroup: muatan,
                             ));
                             if (data != null) {
-                              jenisekspedisi_c.text = data;
+                              cont.muatan_c.value.text = data;
                             }
-                          }),
-                      textEditingController: jenisekspedisi_c,
-                      hintText: "Jenis Ekspedisi",
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: CustomTextField(
-                      textEditingController: muatan_c,
-                      hintText: "Muatan",
-                      prefixIcon: IconButton(
-                        icon: Icon(
-                          Icons.search,
-                          color: ThemeColor.mainColor,
+                          },
                         ),
-                        onPressed: () async {
-                          final data = await Get.dialog(FreightDialog(
-                            dataGroup: muatan,
-                          ));
-                          if (data != null) {
-                            muatan_c.text = data;
-                          }
-                        },
                       ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CustomTextField(
-                      textEditingController: manifest_c,
+                      textEditingController: cont.manifest_c.value,
                       hintText: "Nomor Manifest/SPB",
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CustomTextField(
-                      textEditingController: driver_c,
+                      textEditingController: cont.driver_c.value,
                       hintText: "Nama Driver",
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: CustomTextField(
-                      textEditingController: origin_c,
-                      hintText: "Berangkat Dari",
-                      prefixIcon: IconButton(
-                        icon: Icon(
-                          Icons.search,
-                          color: ThemeColor.mainColor,
+                    child: Obx(
+                      () => CustomTextField(
+                        textEditingController: cont.origin_c.value,
+                        hintText: "Berangkat Dari",
+                        prefixIcon: IconButton(
+                          icon: Icon(
+                            Icons.search,
+                            color: ThemeColor.mainColor,
+                          ),
+                          onPressed: () async {
+                            final data = await Get.dialog(FreightDialog(
+                              dataGroup: origin,
+                            ));
+                            if (data != null) {
+                              cont.origin_c.value.text = data;
+                            }
+                          },
                         ),
-                        onPressed: () async {
-                          final data = await Get.dialog(FreightDialog(
-                            dataGroup: origin,
-                          ));
-                          if (data != null) {
-                            origin_c.text = data;
-                          }
-                        },
                       ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CustomTextField(
-                      textEditingController: inputter_c,
+                      textEditingController: cont.inputter_c.value,
                       hintText: "Diinput Oleh",
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CustomTextField(
-                      textEditingController: remark_c,
+                      textEditingController: cont.remark_c.value,
                       hintText: "Remark (Opsional)",
                     ),
                   ),
@@ -195,65 +197,65 @@ class InputDelivery extends GetResponsiveView {
                       title: "Kirim Data",
                       width: 120,
                       onTap: () async {
-                        if (tanggal_c.text.isEmpty) {
+                        if (cont.tanggal_c.value.text.isEmpty) {
                           customErrorMessage("Error", "Tanggal Harus diisi !");
                           return;
                         }
-                        if (namaekspedisi_c.text.isEmpty) {
+                        if (cont.namaekspedisi_c.value.text.isEmpty) {
                           customErrorMessage(
                               "Error", "Nama Ekspedisi Harus diisi !");
                           return;
                         }
-                        if (jenisekspedisi_c.text.isEmpty) {
+                        if (cont.jenisekspedisi_c.value.text.isEmpty) {
                           customErrorMessage(
                               "Error", "Jenis Ekspedisi Harus diisi !");
                           return;
                         }
-                        if (muatan_c.text.isEmpty) {
+                        if (cont.muatan_c.value.text.isEmpty) {
                           customErrorMessage(
                               "Error", "Jenis Muatan Harus diisi !");
                           return;
                         }
-                        if (manifest_c.text.isEmpty) {
+                        if (cont.manifest_c.value.text.isEmpty) {
                           customErrorMessage(
                               "Error", "Nomor Manifest Harus diisi !");
                           return;
                         }
-                        if (driver_c.text.isEmpty) {
+                        if (cont.driver_c.value.text.isEmpty) {
                           customErrorMessage(
                               "Error", "Nama Driver Harus diisi !");
                           return;
                         }
-                        if (origin_c.text.isEmpty) {
+                        if (cont.origin_c.value.text.isEmpty) {
                           customErrorMessage(
                               "Error", "Asal Keberangkatan Harus diisi !");
                           return;
                         }
-                        if (inputter_c.text.isEmpty) {
+                        if (cont.inputter_c.value.text.isEmpty) {
                           customErrorMessage("Error", "Isi nama anda !");
                           return;
                         }
                         LoaderDialog.showLoadingDialog("Submitting data");
                         await submitData(
                           dt!,
-                          tanggal_c.text,
-                          namaekspedisi_c.text,
-                          nopol_c.text.isEmpty
-                              ? nopol_c.text.replaceAll("", "-")
-                              : nopol_c.text,
-                          jenisekspedisi_c.text,
-                          muatan_c.text,
-                          manifest_c.text.isEmpty
-                              ? manifest_c.text.replaceAll("", "-")
-                              : manifest_c.text,
-                          driver_c.text,
-                          origin_c.text,
-                          inputter_c.text.isEmpty
-                              ? inputter_c.text.replaceAll("", "-")
-                              : inputter_c.text,
-                          remark_c.text.isEmpty
-                              ? remark_c.text.replaceAll("", "-")
-                              : remark_c.text,
+                          cont.tanggal_c.value.text,
+                          cont.namaekspedisi_c.value.text,
+                          cont.nopol_c.value.text.isEmpty
+                              ? cont.nopol_c.value.text.replaceAll("", "-")
+                              : cont.nopol_c.value.text,
+                          cont.jenisekspedisi_c.value.text,
+                          cont.muatan_c.value.text,
+                          cont.manifest_c.value.text.isEmpty
+                              ? cont.manifest_c.value.text.replaceAll("", "-")
+                              : cont.manifest_c.value.text,
+                          cont.driver_c.value.text,
+                          cont.origin_c.value.text,
+                          cont.inputter_c.value.text.isEmpty
+                              ? cont.inputter_c.value.text.replaceAll("", "-")
+                              : cont.inputter_c.value.text,
+                          cont.remark_c.value.text.isEmpty
+                              ? cont.remark_c.value.text.replaceAll("", "-")
+                              : cont.remark_c.value.text,
                         );
                       })
                 ],
@@ -313,15 +315,15 @@ class InputDelivery extends GetResponsiveView {
     Get.back();
 
     dt = null;
-    tanggal_c.clear();
-    namaekspedisi_c.clear();
-    nopol_c.clear();
-    jenisekspedisi_c.clear();
-    muatan_c.clear();
-    manifest_c.clear();
-    driver_c.clear();
-    origin_c.clear();
-    inputter_c.clear();
+    cont.tanggal_c.value.clear();
+    cont.namaekspedisi_c.value.clear();
+    cont.nopol_c.value.clear();
+    cont.jenisekspedisi_c.value.clear();
+    cont.muatan_c.value.clear();
+    cont.manifest_c.value.clear();
+    cont.driver_c.value.clear();
+    cont.origin_c.value.clear();
+    cont.inputter_c.value.clear();
 
     customSuccessMessage("Success", "Sukses Mengirim Data !");
   }
